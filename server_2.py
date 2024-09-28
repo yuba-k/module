@@ -21,8 +21,8 @@ class Server():
         self.conn,_ =  self.s.accept()
 
     def encode_send(self,i):
-        self.cap.capture(f"/home/pi/send_pic/cap{i}.jpg")
-        with open(f"/home/pi/send_pic/cap{i}.jpg",'rb') as f:
+        self.cap.capture(f"/send_pic/cap{i}.jpg")
+        with open(f"/send_pic/cap{i}.jpg",'rb') as f:
             encode = base64.urlsafe_b64encode(f.read())
         self.conn.send(encode)
         self.conn.sendall(b"end_to_send")
