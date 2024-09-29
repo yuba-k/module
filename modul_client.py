@@ -31,13 +31,12 @@ class Disp():
                 self.image_on_canvas,
                 image=self.img,  # 表示画像データ
             )
-            self.canvas.update()
             self.number += 1
         self.root.after(300,self.updata)
 
 def cv2_to_tk(num):
     try:
-        cv2_img = cv2.imread(f"decode{num}.jpg")
+        cv2_img = cv2.imread(f"./rec_img/decode{num}.jpg")
         rgb_cv2_img = cv2.cvtColor(cv2_img, cv2.COLOR_BGR2RGB)
         # NumPy配列からPIL画像オブジェクトを生成
         pil_img = Image.fromarray(rgb_cv2_img)
@@ -63,17 +62,20 @@ class Reciver():
 
     def rec(self):
         print("受け取りはじめ")
-        with open(f'decode{self.j}.jpg', mode='wb') as f:
+        with open(f'./rec_img/decode{self.j}.jpg', mode='wb') as f:
             while True:
                 data = self.s.recv(1024)
-                if b"end_to_send" in data:
-                    data = data.replace(b"end_to_send",b"===========")
+                try:
+                    if b"end_to_send" in data:
+                        data = data.replace(b"end_to_send",b"===========")
+                        save_img = base64.urlsafe_b64decode(data)
+                        f.write(save_img)
+                        self.s.sendall(b'next')
+                        break
                     save_img = base64.urlsafe_b64decode(data)
                     f.write(save_img)
-                    self.s.sendall(b'next')
-                    break
-                save_img = base64.urlsafe_b64decode(data)
-                f.write(save_img)
+                except binascii.Error:
+                    pass
         print("デコード&受け取り終わり")
 
 def main():
@@ -88,7 +90,7 @@ def main():
     canvas.pack()
     disp = Disp(root,canvas=canvas)
     disp.window()
-    rec = Reciver(ip="192.168.57.132")
+    rec = Reciver(ip="192.168.250.132")
     thread = threading.Thread(target=rec.work)
     thread.start()
     root.mainloop()

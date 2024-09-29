@@ -53,13 +53,13 @@ class Display():
                 self.image_on_canvas,
                 image=self.img,  # 表示画像データ
             )
-            self.img_canvas.update()
+#            self.img_canvas.update()
             self.number += 1
         self.root.after(300,self.updata)
 
 def cv2_to_tk(num):
     try:
-        cv2_img = cv2.imread(f"decode{num}.jpg")
+        cv2_img = cv2.imread(f"./rec_img/decode{num}.jpg")
         rgb_cv2_img = cv2.cvtColor(cv2_img, cv2.COLOR_BGR2RGB)
         # NumPy配列からPIL画像オブジェクトを生成
         pil_img = Image.fromarray(rgb_cv2_img)
@@ -71,7 +71,7 @@ def cv2_to_tk(num):
 
 class Reciver():
     def __init__(self):
-        ip = "192.168.24.132"
+        ip = "192.168.250.132"
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.connect((ip, 63000))
         self.full_data = b""
@@ -86,7 +86,7 @@ class Reciver():
 
     def rec(self):
         print("受け取りはじめ")
-        with open(f'decode{self.j}.jpg', mode='wb') as f:
+        with open(f'./rec_img/decode{self.j}.jpg', mode='wb') as f:
             while True:
                 try:
                     data = self.s.recv(1024)
@@ -98,7 +98,7 @@ class Reciver():
                         break
                     save_img = base64.urlsafe_b64decode(data)
                     f.write(save_img)
-                except binacii.Error:
+                except binascii.Error:
                     pass
         print("デコード&受け取り終わり")
 

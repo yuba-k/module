@@ -8,9 +8,9 @@ class Screen():
         self.root=root
         self.width=1920
         self.height=1080
-#        self.root.resizable(width=False,height=False)
+        self.root.resizable(width=False,height=False)
         ctypes.windll.shcore.SetProcessDpiAwareness(1)
-        self.ip = "192.168.57.132"
+        self.ip = "192.168.250.132"
 
 
     def main_frame(self):
