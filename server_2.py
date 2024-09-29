@@ -3,6 +3,7 @@ import socket
 import base64
 import time
 import cv2
+import motor
 
 # picamera.capture_continuous()
 # https://qiita.com/uneyamauneko/items/411edbc695f1222535df
@@ -19,6 +20,7 @@ class Server():
         self.s.bind((ipaddr,63000))
         self.s.listen(1)
         self.conn,_ =  self.s.accept()
+        self.motor_cont = motor.Motor()
 
     def encode_send(self,i):
         self.cap.capture(f"/send_pic/cap{i}.jpg")
@@ -30,6 +32,10 @@ class Server():
 
     def closed(self):
         self.s.close()
+    
+    # def listen(self):
+    #     command = self.conn.recv()
+    #     self.motor_cont(command)
 
 def main():
     try:
