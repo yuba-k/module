@@ -1,13 +1,15 @@
 import RPi.GPIO as GPIO
 import time
+import configparser
 
 class Motor():
     def __init__(self,config):
-        self.duty = config['MOTER'].get('duty')
-        self.right_pwm = config['MOTER'].get('right_pwm')
-        self.left_pwm = config['MOTER'].get('left_pwm')
-        self.right_phase = config['MOTER'].get('right_ph')
-        self.left_phase = config['MOTER'].get('right_ph')
+        self.config = config
+        self.duty = int(self.config['MOTER'].get('duty'))
+        self.right_pwm = int(self.config['MOTER'].get('right_pwm'))
+        self.left_pwm = int(self.config['MOTER'].get('left_pwm'))
+        self.right_phase = int(self.config['MOTER'].get('right_ph'))
+        self.left_phase = int(self.config['MOTER'].get('left_ph'))
 
         GPIO.setmode(GPIO.BCM)#setmodeでBCMを用いて指定することを宣言　#GPIOピン番号のこと！
 
@@ -16,16 +18,16 @@ class Motor():
         self.initialize_motors()
 
     def setup_gpio(self):
-        GPIO.setup(right_pwm,GPIO.OUT)#PWM出力
-        GPIO.setup(right_phase,GPIO.OUT)#デジタル出力
-        GPIO.setup(left_pwm,GPIO.OUT)#PWM出力
-        GPIO.setup(left_phase,GPIO.OUT)#デジタル出力
+        GPIO.setup(self.right_pwm,GPIO.OUT)#PWM出力
+        GPIO.setup(self.right_phase,GPIO.OUT)#デジタル出力
+        GPIO.setup(self.left_pwm,GPIO.OUT)#PWM出力
+        GPIO.setup(self.left_phase,GPIO.OUT)#デジタル出力
 
     def initialize_motors(self):
-        self.right = GPIO.PWM(right_pwm,200)
-        self.left = GPIO.PWM(left_pwm,200)
-        GPIO.output(right_phase,GPIO.LOW)
-        GPIO.output(left_phase,GPIO.LOW)
+        self.right = GPIO.PWM(self.right_pwm,200)
+        self.left = GPIO.PWM(self.left_pwm,200)
+        GPIO.output(self.right_phase,GPIO.LOW)
+        GPIO.output(self.left_phase,GPIO.LOW)
         self.right.start(0)
         self.left.start(0)
 
@@ -56,3 +58,21 @@ class Motor():
         
     def cleanup(self):
         GPIO.cleanup()
+
+def main():
+    #ConfigParserオブジェクトを生成
+    config = configparser.ConfigParser()
+
+    #設定ファイル読み込み
+    config.read("cansat_config.ini")
+    motor = Motor(config)
+    print("forward,right,left")
+    try:
+        while True:
+            direction =input("direction:")
+            motor.move(direction,3)
+    except KeyboardInterrupt:
+        motor.cleanup()
+
+if __name__ == "__main__":
+    main()
