@@ -3,7 +3,9 @@ import numpy as np
 import cv2
 
 # ソケットの設定
-socket_path = '/tmp/ram/camera.sock'
+ipaddr = ""
+port = ""
+socket_path = (f"{ipaddr}",f"{port}")
 
 def receive_images():
     # ソケットの作成

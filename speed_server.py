@@ -4,7 +4,9 @@ import socket
 import time
 
 # ソケットの設定
-socket_path = '/tmp/ram/camera.sock'
+ipaddr = ""
+port = ""
+socket_path = (f"{ipaddr}",f"{port}")
 
 def start_camera():
     # カメラの初期設定
