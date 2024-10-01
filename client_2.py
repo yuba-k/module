@@ -43,7 +43,7 @@ class Display():
         self.updata()
 
     def updata(self):
-        print(f"updata実行:{self.number}")
+#        print(f"updata実行:{self.number}")
         r_img = cv2_to_tk(self.number)
         if r_img == "Null":
             pass
@@ -71,7 +71,7 @@ def cv2_to_tk(num):
 
 class Reciver():
     def __init__(self):
-        ip = "192.168.250.132"
+        ip = "192.168.156.132"
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.connect((ip, 63000))
         self.full_data = b""
@@ -79,13 +79,13 @@ class Reciver():
     def work(self):
         self.j = 1
         while True:
-            print(self.j)
+#            print(self.j)
             self.rec()
             time.sleep(0.05)
             self.j += 1
 
     def rec(self):
-        print("受け取りはじめ")
+#        print("受け取りはじめ")
         with open(f'./rec_img/decode{self.j}.jpg', mode='wb') as f:
             while True:
                 try:
@@ -100,7 +100,10 @@ class Reciver():
                     f.write(save_img)
                 except binascii.Error:
                     pass
-        print("デコード&受け取り終わり")
+#        print("デコード&受け取り終わり")
+    def command(self):
+        while True:
+            self.s.sendall(input("forward,right,left : ").encode('utf-8'))
 
 def main():
     try:
@@ -109,12 +112,12 @@ def main():
         reciver = Reciver()
         stop_event = threading.Event()#強制停止の準備
         display.window()
-        # thread1 = threading.Thread(target=display.window)
+        thread1 = threading.Thread(target=reciver.command)
         thread2 = threading.Thread(target=reciver.work)
-        # thread1.start()
+        thread1.start()
         thread2.start()
         root.mainloop()
-        # thread1.join()
+        thread1.join()
         thread2.join()
         print("all finish")
     except KeyboardInterrupt:
