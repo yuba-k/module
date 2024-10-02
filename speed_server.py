@@ -2,11 +2,13 @@ import picamera
 import picamera.array
 import socket
 import time
+import cv2
+
 
 # ソケットの設定
-ipaddr = ""
-port = ""
-socket_path = (f"{ipaddr}",f"{port}")
+ipaddr = "192.168.171.132"
+port = 8000
+socket_path = ((ipaddr,8000))
 
 def start_camera():
     # カメラの初期設定
@@ -19,8 +21,9 @@ def start_camera():
         time.sleep(2)  # カメラのウォームアップ
 
         # ソケットの作成
-        server_socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-        server_socket.bind(socket_path)
+        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        server_socket.bind((ipaddr,8000))
         server_socket.listen(1)
 
         print("Waiting for a connection...")
@@ -36,6 +39,7 @@ def start_camera():
                 # クライアントに送信
                 connection.sendall(img_encoded.tobytes())
                 stream.truncate(0)  # ストリームをリセット
+                connection.sendall(b"fin")
 
         finally:
             connection.close()
