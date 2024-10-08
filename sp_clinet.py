@@ -3,9 +3,11 @@ import numpy as np
 import cv2
 import threading
 import tkinter as tk
+from PIL import ImageTk, Image
+import time
 
 # ソケットの設定
-ipaddr = "192.168.171.132"
+ipaddr = "192.168.171.38"
 port = 8000
 socket_path = ((ipaddr,8000))
 
@@ -14,21 +16,18 @@ class Window():
         self.root = root
         self.image_label = tk.Label(self.root)
         self.image_label.pack()
-
-        self.running = 1
-
+        self.flag = False
+        self.running = True
         threading.Thread(target=self.receive_images).start()
+        self.cheaker()
 
-        self.update_image()
-
-    def receive_images():
+    def receive_images(self):
         # ソケットの作成
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client_socket.connect((ipaddr,8000))
 
         try:
-            i = 0
-            while True:
+            while self.running:
                 # データを受信
                 data = bytearray()
                 while self.running:
@@ -43,28 +42,42 @@ class Window():
                     except Exception as e:
                         print(e)
                 # 受信したデータから画像をデコード
-                img_array = np.frombuffer(data, np.uint8)
-                self.img = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
+                if data:
+                    self.img_array = np.frombuffer(data, np.uint8)
+                    self.img = cv2.imdecode(self.img_array, cv2.IMREAD_COLOR)
 
-                if img is not None:
-                    cv2.imshow('Received Image', self.img)  # 画像を表示
-                    cv2.waitKey(1)  # 表示を更新
-                    i += 1
+                    if self.img is not None:
+                        self.flag = True
+                    #     self.update_image()
+                else:
+                    print("none image")
 
         finally:
             client_socket.close()
             cv2.destroyAllWindows()
 
+    def cheaker(self):
+        while True:
+            if self.flag == True:
+                self.update_image()
+                break
+            time.sleep(0.2)
+            
     def update_image(self):
-        self.tk_image = ImageTk.PhotoImage(self.img)
-        self.image_label.config(image=self.tk_image)
-
+        try:
+            self.img = cv2.cvtColor(self.img,cv2.COLOR_BGR2RGB)
+            pil_img = Image.fromarray(self.img)
+            self.tk_image = ImageTk.PhotoImage(pil_img)
+            self.image_label.config(image=self.tk_image)
+        except cv2.error as e:
+            print(e)
         self.root.after(20,self.update_image)
     
     def close(self):
-        self.running = 0
+        self.running = False
 
 if __name__ == '__main__':
     root = tk.Tk()
     window = Window(root)
     root.mainloop()
+    window.close()

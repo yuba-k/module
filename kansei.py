@@ -1,6 +1,6 @@
 import tkinter as tk
 import ctypes
-import modul_client
+import sp_clinet
 import threading
 class Screen():
 
@@ -116,11 +116,7 @@ class Screen():
         auto_mode9.place(relwidth=1.0,relheight=1.0)
 
     def updata(self):
-        img_updata = modul_client.Disp(self.root,self.canvas)
-        img_updata.window()
-    def rec(self):
-        img_rec = modul_client.Reciver(self.ip)
-        img_rec.work()
+        img_updata = sp_clinet.Window(self.root)
 
 
 

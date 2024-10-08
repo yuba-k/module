@@ -6,7 +6,7 @@ import cv2
 
 
 # ソケットの設定
-ipaddr = "192.168.171.132"
+ipaddr = "192.168.171.38"
 port = 8000
 socket_path = ((ipaddr,8000))
 
