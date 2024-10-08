@@ -15,6 +15,9 @@ def start_camera():
     camera = picamera.PiCamera()
     camera.resolution = (640, 480)  # 解像度を640x480に設定
     camera.framerate = 60  # フレームレートを60fpsに設定
+    camera.exposure_mode = 'off' #露出モード
+    camera.meter_mode = 'average' #測光モード
+    camera.awb_mode = 'fluorescent'
 
     # ストリームを作成
     with picamera.array.PiRGBArray(camera) as stream:
