@@ -37,13 +37,13 @@ class Screen():
         auto_mode2.place(relwidth=1.0,relheight=1.0)
 
         ###画像###
-        select_img=tk.Frame(self.root,
+        self.select_img=tk.Frame(self.root,
                   width=480,
                   height=360,
                   bg="red")
-        select_img.place(x=720,y=50)
-        self.canvas = tk.Canvas(select_img,width=480,height=360,bg="blue")
-        self.canvas.place(x=0,y=0)
+        self.select_img.place(x=720,y=50)
+        # self.canvas = tk.Canvas(select_img,width=480,height=360,bg="blue")
+        # self.canvas.place(x=0,y=0)
         # self.img = tk.PhotoImage(file = "testimg.png",
         #                     width=480,
         #                     height=360,)
@@ -115,8 +115,8 @@ class Screen():
         auto_mode9=tk.Button(select_f8,text="右旋回",font=("normal",60),command=lambda:check(4))
         auto_mode9.place(relwidth=1.0,relheight=1.0)
 
-    def updata(self):
-        img_updata = sp_clinet.Window(self.root)
+    def rec(self):
+        img_updata = sp_clinet.Window(self.root,self.select_img,480,360)
 
 
 
@@ -124,7 +124,7 @@ def main():
     root=tk.Tk()
     screen=Screen(root=root)
     screen.main_frame()
-    screen.updata()
+    screen.rec()
     thread = threading.Thread(target=screen.rec)
     thread.start()
     root.mainloop()

@@ -6,7 +6,7 @@ import cv2
 
 
 # ソケットの設定
-ipaddr = "192.168.171.38"
+ipaddr = "192.168.29.38"
 port = 8000
 socket_path = ((ipaddr,8000))
 
@@ -14,10 +14,11 @@ def start_camera():
     # カメラの初期設定
     camera = picamera.PiCamera()
     camera.resolution = (640, 480)  # 解像度を640x480に設定
-    camera.framerate = 60  # フレームレートを60fpsに設定
-    camera.exposure_mode = 'off' #露出モード
+    camera.framerate = 30  # フレームレートを60fpsに設定
+    camera.exposure_mode = 'auto' #露出モード
     camera.meter_mode = 'average' #測光モード
     camera.awb_mode = 'fluorescent'
+
 
     # ストリームを作成
     with picamera.array.PiRGBArray(camera) as stream:
