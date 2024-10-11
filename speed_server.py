@@ -12,10 +12,13 @@ ipaddr = "192.168.29.38"
 port = 8000
 socket_path = ((ipaddr,8000))
 
-global server_socket
+connection = None
+
+flag = False
 
 def start_camera():
-    global server_socket
+    global connection
+    global flag
     # カメラの初期設定
     camera = picamera.PiCamera()
     camera.resolution = (640, 480)  # 解像度を640x480に設定
@@ -37,6 +40,8 @@ def start_camera():
         print("Waiting for a connection...")
         connection, client_address = server_socket.accept()
         print("Connection established!")
+        flag = True
+
 
         try:
             for frame in camera.capture_continuous(stream, format='bgr', use_video_port=True):
@@ -55,12 +60,23 @@ def start_camera():
             camera.close()
 
 def listen(motor_control):
-    global server_socket
+    global connection
+    global flag
+    print("読み込まれたよ!")
     while True:
-        cmd = server_socket.recv(64)
-        print(cmd.decode())
-        motor_control.move(cmd.decode(),2)
-
+        if flag:
+            try:
+                cmd = connection.recv(8)
+                if cmd:
+                    print(f"受信:{cmd.decode()}")
+                    motor_control.move(cmd.decode(), 2)
+                else:
+                    print("接続が切れました")
+                    break
+            except Exception as e:
+                print(f"受信エラー: {e}")
+                break
+        time.sleep(0.1)  # CPU使用率を下げるために少し待機
 
 if __name__ == '__main__':
     #ConfigParserオブジェクトを生成
@@ -69,8 +85,9 @@ if __name__ == '__main__':
     #設定ファイル読み込み
     config.read("cansat_config.ini")
     motor = motor.Motor(config)
-    thread1 = threading.Thread(target=lambda:listen(motor),daemon=True)
-    thread2 = threading.Thread(target=start_camera(),daemon=True)
+
+    thread1 = threading.Thread(target=start_camera,daemon=True)
+    thread2 = threading.Thread(target=lambda:listen(motor),daemon=True)
     thread1.start()
     thread2.start()
     thread1.join()

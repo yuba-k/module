@@ -74,6 +74,7 @@ class Window():
 
     def send_command(self,cmd):
         self.client_socket.sendall(cmd.encode('utf-8'))
+        print(f"コマンド:{cmd}")
     
     def close(self):
         self.running = False
