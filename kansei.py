@@ -2,6 +2,8 @@ import tkinter as tk
 import ctypes
 import sp_clinet
 import threading
+import configparser
+
 class Screen():
 
     def __init__(self,root):
@@ -11,6 +13,8 @@ class Screen():
         self.root.resizable(width=False,height=False)
         ctypes.windll.shcore.SetProcessDpiAwareness(1)
         self.ip = "192.168.250.132"
+
+        self.flag = False
 
 
     def main_frame(self):
@@ -37,11 +41,12 @@ class Screen():
         auto_mode2.place(relwidth=1.0,relheight=1.0)
 
         ###画像###
-        self.select_img=tk.Frame(self.root,
+        self.select_img = tk.Frame(self.root,
                   width=480,
                   height=360,
                   bg="red")
         self.select_img.place(x=720,y=50)
+        self.flag = True
         # self.canvas = tk.Canvas(select_img,width=480,height=360,bg="blue")
         # self.canvas.place(x=0,y=0)
         # self.img = tk.PhotoImage(file = "testimg.png",
@@ -61,12 +66,16 @@ class Screen():
         def check(a):
             if a==1:
                 b="左旋回中"
+                self.window.send_command("left")
             elif a==2:
                 b="前進中"
+                self.window.send_command("forward")
             elif a==3:
                 b="後退中"
+                self.window.send_command("back")
             elif a==4:
                 b="右旋回中"
+                self.window.send_command("right")
             text1=tk.Label(select_f3,text=b,font=("normal",60))###textをbにする###
             text1.place(relwidth=1.0,relheight=1.0)
 
@@ -116,7 +125,14 @@ class Screen():
         auto_mode9.place(relwidth=1.0,relheight=1.0)
 
     def rec(self):
-        img_updata = sp_clinet.Window(self.root,self.select_img,480,360)
+        while True:    
+            if self.flag:
+                self.window = sp_clinet.Window(self.root,self.select_img,480,360)
+                break
+
+    def fin(self):
+        self.window.close()
+
 
 
 
@@ -129,6 +145,7 @@ def main():
     thread.start()
     root.mainloop()
     thread.join()
+    screen.fin()
 
 
 if __name__=="__main__":

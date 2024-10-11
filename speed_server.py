@@ -3,14 +3,19 @@ import picamera.array
 import socket
 import time
 import cv2
-
+import threading
+import motor
+import configparser
 
 # ソケットの設定
 ipaddr = "192.168.29.38"
 port = 8000
 socket_path = ((ipaddr,8000))
 
+global server_socket
+
 def start_camera():
+    global server_socket
     # カメラの初期設定
     camera = picamera.PiCamera()
     camera.resolution = (640, 480)  # 解像度を640x480に設定
@@ -18,7 +23,6 @@ def start_camera():
     camera.exposure_mode = 'auto' #露出モード
     camera.meter_mode = 'average' #測光モード
     camera.awb_mode = 'fluorescent'
-
 
     # ストリームを作成
     with picamera.array.PiRGBArray(camera) as stream:
@@ -50,5 +54,24 @@ def start_camera():
             server_socket.close()
             camera.close()
 
+def listen(motor_control):
+    global server_socket
+    while True:
+        cmd = server_socket.recv(64)
+        print(cmd.decode())
+        motor_control.move(cmd.decode(),2)
+
+
 if __name__ == '__main__':
-    start_camera()
+    #ConfigParserオブジェクトを生成
+    config = configparser.ConfigParser()
+
+    #設定ファイル読み込み
+    config.read("cansat_config.ini")
+    motor = motor.Motor(config)
+    thread1 = threading.Thread(target=lambda:listen(motor),daemon=True)
+    thread2 = threading.Thread(target=start_camera(),daemon=True)
+    thread1.start()
+    thread2.start()
+    thread1.join()
+    thread2.join()

@@ -27,8 +27,8 @@ class Window():
 
     def receive_images(self):
         # ソケットの作成
-        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        client_socket.connect((ipaddr,8000))
+        self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.client_socket.connect((ipaddr,8000))
 
         try:
             while self.running:
@@ -37,7 +37,7 @@ class Window():
                 while self.running:
                     try:
                         # 受信データを逐次追加
-                        packet = client_socket.recv(4096)
+                        packet = self.client_socket.recv(4096)
                         if b"fin" in packet:
                             packet = packet.replace(b"fin",b"===")
                             data.extend(packet)
@@ -57,7 +57,7 @@ class Window():
                     print("none image")
 
         finally:
-            client_socket.close()
+            self.client_socket.close()
             cv2.destroyAllWindows()
             
     def update_image(self):
@@ -71,6 +71,9 @@ class Window():
             except cv2.error as e:
                 print(e)
         self.root.after(20,self.update_image)
+
+    def send_command(self,cmd):
+        self.client_socket.sendall(cmd.encode('utf-8'))
     
     def close(self):
         self.running = False
