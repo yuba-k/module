@@ -140,7 +140,6 @@ def main():
     root=tk.Tk()
     screen=Screen(root=root)
     screen.main_frame()
-    screen.rec()
     thread = threading.Thread(target=screen.rec)
     thread.start()
     root.mainloop()

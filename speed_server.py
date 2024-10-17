@@ -8,7 +8,7 @@ import motor
 import configparser
 
 # ソケットの設定
-ipaddr = "192.168.29.38"
+ipaddr = "192.168.169.38"
 port = 8000
 socket_path = ((ipaddr,8000))
 
@@ -59,24 +59,59 @@ def start_camera():
             server_socket.close()
             camera.close()
 
+# def listen(motor_control):
+#     global connection
+#     global flag
+#     print("読み込まれたよ!")
+#     while True:
+#         print(f"待機中:{flag}")
+#         if flag:
+#             while True:
+#                 print("a")
+#                 reccmd = connection.recv(8)
+#                 reccmd = reccmd.decode()
+#                 print("b")
+#                 if "fin" in reccmd:
+#                     reccmd = reccmd.replace("fin","")
+#                     cmd += reccmd.decode()
+#                     break
+#             print(f"受信:{cmd}")
+#             motor_control.move(cmd, 2)
+#         time.sleep(0.1)
+
 def listen(motor_control):
     global connection
     global flag
     print("読み込まれたよ!")
+    
+    cmd = ""  # cmdの初期化
     while True:
+        print(f"待機中:{flag}")
         if flag:
-            try:
-                cmd = connection.recv(8)
-                if cmd:
-                    print(f"受信:{cmd.decode()}")
-                    motor_control.move(cmd.decode(), 2)
-                else:
-                    print("接続が切れました")
+            while True:
+                print("a")
+                try:
+                    print("try")
+                    # 受信データをバッファサイズを調整して受信
+                    reccmd = connection.recv(1024).decode()  # バッファサイズを増やす
+                    if not reccmd:
+                        print("接続が閉じられました。")
+                        return
+                except Exception as e:
+                    print(f"エラー: {e}")
                     break
-            except Exception as e:
-                print(f"受信エラー: {e}")
-                break
-        time.sleep(0.1)  # CPU使用率を下げるために少し待機
+                print("b")
+                # "fin"が受信された場合、コマンドを保存
+                if "fin" in reccmd:
+                    cmd += reccmd.replace("fin", "")
+                    print(f"受信:{cmd}")
+                    motor_control.move(cmd, 2)
+                    cmd = ""  # コマンドを処理後にリセット
+                    break  # コマンドを処理したのでループを抜ける
+                
+        time.sleep(0.1)
+
+
 
 if __name__ == '__main__':
     #ConfigParserオブジェクトを生成
@@ -87,8 +122,7 @@ if __name__ == '__main__':
     motor = motor.Motor(config)
 
     thread1 = threading.Thread(target=start_camera,daemon=True)
-    thread2 = threading.Thread(target=lambda:listen(motor),daemon=True)
     thread1.start()
-    thread2.start()
+    listen(motor)
     thread1.join()
-    thread2.join()
+    motor.cleanup()

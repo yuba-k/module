@@ -7,7 +7,7 @@ from PIL import ImageTk, Image
 import time
 
 # ソケットの設定
-ipaddr = "192.168.29.38"
+ipaddr = "192.168.169.38"
 port = 8000
 socket_path = ((ipaddr,8000))
 
@@ -73,7 +73,7 @@ class Window():
         self.root.after(20,self.update_image)
 
     def send_command(self,cmd):
-        self.client_socket.sendall(cmd.encode('utf-8'))
+        self.client_socket.sendall((cmd+"fin").encode('utf-8'))
         print(f"コマンド:{cmd}")
     
     def close(self):
