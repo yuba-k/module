@@ -26,8 +26,8 @@ class Motor():
     def initialize_motors(self):
         self.right = GPIO.PWM(self.right_pwm,200)
         self.left = GPIO.PWM(self.left_pwm,200)
-        GPIO.output(self.right_phase,GPIO.LOW)
-        GPIO.output(self.left_phase,GPIO.LOW)
+        GPIO.output(self.right_phase,GPIO.HIGH)
+        GPIO.output(self.left_phase,GPIO.HIGH)
         self.right.start(0)
         self.left.start(0)
 
@@ -53,8 +53,8 @@ class Motor():
             self.left_duty = self.duty * 0.6
         else:
             self.right_duty = self.left_duty = self.duty
-            GPIO.output(self.right_phase,GPIO.HIGH)
-            GPIO.output(self.left_phase,GPIO.HIGH)
+            GPIO.output(self.right_phase,GPIO.LOW)
+            GPIO.output(self.left_phase,GPIO.LOW)
         
     def cleanup(self):
         GPIO.cleanup()

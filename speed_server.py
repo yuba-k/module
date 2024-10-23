@@ -8,7 +8,7 @@ import motor
 import configparser
 
 # ソケットの設定
-ipaddr = "192.168.169.38"
+ipaddr = "192.168.76.68"
 port = 8000
 socket_path = ((ipaddr,8000))
 
@@ -22,7 +22,7 @@ def start_camera():
     # カメラの初期設定
     camera = picamera.PiCamera()
     camera.resolution = (640, 480)  # 解像度を640x480に設定
-    camera.framerate = 30  # フレームレートを60fpsに設定
+    camera.framerate = 10  # フレームレートを60fpsに設定
     camera.exposure_mode = 'auto' #露出モード
     camera.meter_mode = 'average' #測光モード
     camera.awb_mode = 'fluorescent'
@@ -53,31 +53,13 @@ def start_camera():
                 connection.sendall(img_encoded.tobytes())
                 stream.truncate(0)  # ストリームをリセット
                 connection.sendall(b"fin")
-
+        except KeyboardInterrupt as e:
+            print(e)
+            flag = False
         finally:
             connection.close()
             server_socket.close()
             camera.close()
-
-# def listen(motor_control):
-#     global connection
-#     global flag
-#     print("読み込まれたよ!")
-#     while True:
-#         print(f"待機中:{flag}")
-#         if flag:
-#             while True:
-#                 print("a")
-#                 reccmd = connection.recv(8)
-#                 reccmd = reccmd.decode()
-#                 print("b")
-#                 if "fin" in reccmd:
-#                     reccmd = reccmd.replace("fin","")
-#                     cmd += reccmd.decode()
-#                     break
-#             print(f"受信:{cmd}")
-#             motor_control.move(cmd, 2)
-#         time.sleep(0.1)
 
 def listen(motor_control):
     global connection
@@ -86,17 +68,17 @@ def listen(motor_control):
     
     cmd = ""  # cmdの初期化
     while True:
-        print(f"待機中:{flag}")
         if flag:
             while True:
-                print("a")
                 try:
-                    print("try")
                     # 受信データをバッファサイズを調整して受信
                     reccmd = connection.recv(1024).decode()  # バッファサイズを増やす
                     if not reccmd:
                         print("接続が閉じられました。")
                         return
+                except KeyboardInterrupt as e:
+                    print(e)
+                    return
                 except Exception as e:
                     print(f"エラー: {e}")
                     break
@@ -108,7 +90,6 @@ def listen(motor_control):
                     motor_control.move(cmd, 2)
                     cmd = ""  # コマンドを処理後にリセット
                     break  # コマンドを処理したのでループを抜ける
-                
         time.sleep(0.1)
 
 

@@ -7,7 +7,7 @@ from PIL import ImageTk, Image
 import time
 
 # ソケットの設定
-ipaddr = "192.168.169.38"
+ipaddr = "192.168.76.68"
 port = 8000
 socket_path = ((ipaddr,8000))
 

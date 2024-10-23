@@ -12,7 +12,6 @@ class Screen():
         self.height=1080
         self.root.resizable(width=False,height=False)
         ctypes.windll.shcore.SetProcessDpiAwareness(1)
-        self.ip = "192.168.250.132"
 
         self.flag = False
 
@@ -47,12 +46,6 @@ class Screen():
                   bg="red")
         self.select_img.place(x=720,y=50)
         self.flag = True
-        # self.canvas = tk.Canvas(select_img,width=480,height=360,bg="blue")
-        # self.canvas.place(x=0,y=0)
-        # self.img = tk.PhotoImage(file = "testimg.png",
-        #                     width=480,
-        #                     height=360,)
-        # self.canvas.create_image(0, 0,anchor=tk.NW, image = self.img)
 
         ###実行中の動作の表示###
         select_f3=tk.Frame(self.root,
