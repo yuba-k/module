@@ -6,17 +6,21 @@ import tkinter as tk
 from PIL import ImageTk, Image
 import time
 
+import img_detc
+
 # ソケットの設定
 ipaddr = "192.168.76.68"
 port = 8000
 socket_path = ((ipaddr,8000))
 
 class Window():
-    def __init__(self,root,img_f,height,weight):
+    def __init__(self,root,img_f,height,weight,mode):
         self.root = root
         self.img_f = img_f
         self.height = height
         self.weight = weight
+
+        self.mode = mode#追加
 
         self.image_label = tk.Label(self.img_f)
         self.image_label.pack()
@@ -65,6 +69,12 @@ class Window():
             self.flag = False
             try:
                 self.img = cv2.cvtColor(self.img,cv2.COLOR_BGR2RGB)
+                if mode == 2:
+                    pass
+                else:
+                    detection = img_detc.Detection(self.img)
+                    direction , self.img = detection.color_detection()
+                    self.send_command(direction)
                 pil_img = Image.fromarray(self.img)
                 self.tk_image = ImageTk.PhotoImage(pil_img)
                 self.image_label.config(image=self.tk_image)

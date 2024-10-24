@@ -12,6 +12,7 @@ class Screen():
         self.height=1080
         self.root.resizable(width=False,height=False)
         ctypes.windll.shcore.SetProcessDpiAwareness(1)
+        self.radio_value = tk.IntVar(value = 2)#追加
 
         self.flag = False
 
@@ -20,15 +21,13 @@ class Screen():
         self.root.title("test")
         self.root.geometry(f"{self.width}x{self.height}")
 
-        var=tk.IntVar(self.root)
-
         ###次の2つはラジオボタン###
         select_f1=tk.Frame(self.root,
                   width=350,
                   height=150,
                   bg="red")
         select_f1.place(x=190,y=50)
-        auto_mode1=tk.Radiobutton(select_f1,text="自動",font=("normal",60),value=1,var=var)
+        auto_mode1=tk.Radiobutton(select_f1,text="自動",font=("normal",60),value=1,variable=self.radio_value)
         auto_mode1.place(relwidth=1.0,relheight=1.0)
         
         select_f2=tk.Frame(self.root,
@@ -36,7 +35,7 @@ class Screen():
                   height=150,
                   bg="red")
         select_f2.place(x=190,y=250)
-        auto_mode2=tk.Radiobutton(select_f2,text="遠隔",font=("normal",60),value=2,var=var)
+        auto_mode2=tk.Radiobutton(select_f2,text="遠隔",font=("normal",60),value=2,variable=self.radio_value)
         auto_mode2.place(relwidth=1.0,relheight=1.0)
 
         ###画像###
@@ -117,10 +116,22 @@ class Screen():
         auto_mode9=tk.Button(select_f8,text="右旋回",font=("normal",60),command=lambda:check(4))
         auto_mode9.place(relwidth=1.0,relheight=1.0)
 
+        #自動(1)の場合：ボタン操作無効,手動(2)の場合：ボタン操作有効
+        if self.radio_value == 1:
+            select_f4["state"] = tk.DISABLED
+            select_f5["state"] = tk.DISABLED
+            select_f6["state"] = tk.DISABLED
+            select_f8["state"] = tk.DISABLED
+        else:
+            select_f4["state"] = tk.NORMAL
+            select_f5["state"] = tk.NORMAL
+            select_f6["state"] = tk.NORMAL
+            select_f8["state"] = tk.NORMAL
+
     def rec(self):
         while True:    
             if self.flag:
-                self.window = sp_clinet.Window(self.root,self.select_img,480,360)
+                self.window = sp_clinet.Window(self.root,self.select_img,480,360,self.radio_value)
                 break
 
     def fin(self):
