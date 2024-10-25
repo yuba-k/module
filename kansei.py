@@ -18,7 +18,7 @@ class Screen():
 
 
     def main_frame(self):
-        self.root.title("test")
+        self.root.title("遠隔操作パネル")
         self.root.geometry(f"{self.width}x{self.height}")
 
         ###次の2つはラジオボタン###
@@ -27,7 +27,7 @@ class Screen():
                   height=150,
                   bg="red")
         select_f1.place(x=190,y=50)
-        auto_mode1=tk.Radiobutton(select_f1,text="自動",font=("normal",60),value=1,variable=self.radio_value)
+        auto_mode1=tk.Radiobutton(select_f1,text="自動",font=("normal",60),value=1,variable=self.radio_value,command=self.mode)
         auto_mode1.place(relwidth=1.0,relheight=1.0)
         
         select_f2=tk.Frame(self.root,
@@ -35,7 +35,7 @@ class Screen():
                   height=150,
                   bg="red")
         select_f2.place(x=190,y=250)
-        auto_mode2=tk.Radiobutton(select_f2,text="遠隔",font=("normal",60),value=2,variable=self.radio_value)
+        auto_mode2=tk.Radiobutton(select_f2,text="遠隔",font=("normal",60),value=2,variable=self.radio_value,command=self.mode)
         auto_mode2.place(relwidth=1.0,relheight=1.0)
 
         ###画像###
@@ -77,8 +77,8 @@ class Screen():
                   height=400,
                   bg="red")
         select_f4.place(x=150,y=550)
-        auto_mode5=tk.Button(select_f4,text="左旋回",font=("normal",60),command=lambda:check(1))
-        auto_mode5.place(relwidth=1.0,relheight=1.0)
+        self.auto_mode5=tk.Button(select_f4,text="左旋回",font=("normal",60),command=lambda:check(1))
+        self.auto_mode5.place(relwidth=1.0,relheight=1.0)
 
         ###前進ボタン###
         select_f5=tk.Frame(self.root,
@@ -86,8 +86,8 @@ class Screen():
                   height=100,
                   bg="red")
         select_f5.place(x=700,y=550)
-        auto_mode6=tk.Button(select_f5,text="前進",font=("normal",60),command=lambda:check(2))
-        auto_mode6.place(relwidth=1.0,relheight=1.0)
+        self.auto_mode6=tk.Button(select_f5,text="前進",font=("normal",60),command=lambda:check(2))
+        self.auto_mode6.place(relwidth=1.0,relheight=1.0)
 
         ###後退ボタン###
         select_f6=tk.Frame(self.root,
@@ -95,8 +95,8 @@ class Screen():
                   height=100,
                   bg="red")
         select_f6.place(x=700,y=750)
-        auto_mode7=tk.Button(select_f6,text="後退",font=("normal",60),command=lambda:check(3))
-        auto_mode7.place(relwidth=1.0,relheight=1.0)
+        self.auto_mode7=tk.Button(select_f6,text="後退",font=("normal",60),command=lambda:check(3))
+        self.auto_mode7.place(relwidth=1.0,relheight=1.0)
 
         ###スケールメーター###
         select_f7=tk.Frame(self.root,
@@ -113,20 +113,23 @@ class Screen():
                   height=400,
                   bg="red")
         select_f8.place(x=1380,y=550)
-        auto_mode9=tk.Button(select_f8,text="右旋回",font=("normal",60),command=lambda:check(4))
-        auto_mode9.place(relwidth=1.0,relheight=1.0)
+        self.auto_mode9=tk.Button(select_f8,text="右旋回",font=("normal",60),command=lambda:check(4))
+        self.auto_mode9.place(relwidth=1.0,relheight=1.0)
 
+    def mode(self):
         #自動(1)の場合：ボタン操作無効,手動(2)の場合：ボタン操作有効
-        if self.radio_value == 1:
-            select_f4["state"] = tk.DISABLED
-            select_f5["state"] = tk.DISABLED
-            select_f6["state"] = tk.DISABLED
-            select_f8["state"] = tk.DISABLED
+        if self.radio_value.get() == 1:
+            self.auto_mode5["state"] = tk.DISABLED
+            self.auto_mode6["state"] = tk.DISABLED
+            self.auto_mode7["state"] = tk.DISABLED
+            self.auto_mode9["state"] = tk.DISABLED
+            self.window.mode = self.radio_value.get()
         else:
-            select_f4["state"] = tk.NORMAL
-            select_f5["state"] = tk.NORMAL
-            select_f6["state"] = tk.NORMAL
-            select_f8["state"] = tk.NORMAL
+            self.auto_mode5["state"] = tk.NORMAL
+            self.auto_mode6["state"] = tk.NORMAL
+            self.auto_mode7["state"] = tk.NORMAL
+            self.auto_mode9["state"] = tk.NORMAL
+            self.window.mode = self.radio_value.get()
 
     def rec(self):
         while True:    

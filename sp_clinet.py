@@ -9,7 +9,7 @@ import time
 import img_detc
 
 # ソケットの設定
-ipaddr = "192.168.76.68"
+ipaddr = "192.168.194.68"
 port = 8000
 socket_path = ((ipaddr,8000))
 
@@ -20,7 +20,7 @@ class Window():
         self.height = height
         self.weight = weight
 
-        self.mode = mode#追加
+        self.mode = mode
 
         self.image_label = tk.Label(self.img_f)
         self.image_label.pack()
@@ -69,15 +69,18 @@ class Window():
             self.flag = False
             try:
                 self.img = cv2.cvtColor(self.img,cv2.COLOR_BGR2RGB)
-                if mode == 2:
-                    pass
-                else:
-                    detection = img_detc.Detection(self.img)
-                    direction , self.img = detection.color_detection()
-                    self.send_command(direction)
-                pil_img = Image.fromarray(self.img)
-                self.tk_image = ImageTk.PhotoImage(pil_img)
-                self.image_label.config(image=self.tk_image)
+                if self.img is not None:
+                    if self.mode == 2:
+                        pass
+                    elif self.mode == 1:
+                        time.sleep(1.5)
+                        detection = img_detc.Detection(self.img)
+                        direction , self.img = detection.color_detection()
+                        if direction is not None:
+                            self.send_command(direction)
+                    pil_img = Image.fromarray(self.img)
+                    self.tk_image = ImageTk.PhotoImage(pil_img)
+                    self.image_label.config(image=self.tk_image)
             except cv2.error as e:
                 print(e)
         self.root.after(20,self.update_image)

@@ -13,31 +13,35 @@ class Detection():
         _ , self.width , _ = self.img_default.shape
 
     def color_detection(self):
-        hsv = cv2.cvtColor(self.img_default, cv2.COLOR_BGR2HSV)
-        mask = cv2.inRange(hsv, self.bound_lower, self.bound_upper)
-        kernel = np.ones((7, 7), np.uint8)
-        mask_color = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
-        mask_color = cv2.morphologyEx(mask_color, cv2.MORPH_OPEN, kernel)
+        try:
+            hsv = cv2.cvtColor(self.img_default, cv2.COLOR_BGR2HSV)
+            mask = cv2.inRange(hsv, self.bound_lower, self.bound_upper)
+            kernel = np.ones((7, 7), np.uint8)
+            mask_color = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
+            mask_color = cv2.morphologyEx(mask_color, cv2.MORPH_OPEN, kernel)
 
-        # 元の画像とマスクを合成
-        img_result = cv2.bitwise_and(self.img_default, self.img_default, mask=mask_color)
+            # 元の画像とマスクを合成
+            img_result = cv2.bitwise_and(self.img_default, self.img_default, mask=mask_color)
 
-        # 輪郭を描画
-        contours, _ = cv2.findContours(mask_color.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        img_contours = cv2.drawContours(np.zeros_like(self.img_default), contours, -1, (0, 0, 255), 10)
+            # 輪郭を描画
+            contours, _ = cv2.findContours(mask_color.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            img_contours = cv2.drawContours(np.zeros_like(self.img_default), contours, -1, (0, 0, 255), 10)
 
-        # 元の画像に検出結果を重ねる
-        self.img_result = cv2.addWeighted(self.img_default, 0.7, img_result, 0.3, 0)
+            # 元の画像に検出結果を重ねる
+            self.img_result = cv2.addWeighted(self.img_default, 0.7, img_result, 0.3, 0)
 
-        # 輪郭を重ねる
-        self.img_result = cv2.addWeighted(self.img_result, 1, img_contours, 1, 0)
+            # 輪郭を重ねる
+            self.img_result = cv2.addWeighted(self.img_result, 1, img_contours, 1, 0)
 
-        #座標導出
-        gray = cv2.cvtColor(img_result,cv2.COLOR_BGR2GRAY)
-        dst2 = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C,cv2.THRESH_BINARY_INV, 11, 20)
-        white_pixels = np.where(dst2 == 255)
+            #座標導出
+            gray = cv2.cvtColor(img_result,cv2.COLOR_BGR2GRAY)
+            dst2 = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C,cv2.THRESH_BINARY_INV, 11, 20)
+            white_pixels = np.where(dst2 == 255)
 
-        return self.adjust_move(white_pixels,self.img_result)
+            return self.adjust_move(white_pixels),self.img_result
+        except Exception as e:
+            print(f"エラー:{e}")
+            return None,self.img_default
 
     def adjust_move(self,white_pixels):
         x = white_pixels[1][0]

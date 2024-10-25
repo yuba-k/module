@@ -8,7 +8,7 @@ import motor
 import configparser
 
 # ソケットの設定
-ipaddr = "192.168.76.68"
+ipaddr = "0.0.0.0"
 port = 8000
 socket_path = ((ipaddr,8000))
 
@@ -26,6 +26,7 @@ def start_camera():
     camera.exposure_mode = 'auto' #露出モード
     camera.meter_mode = 'average' #測光モード
     camera.awb_mode = 'fluorescent'
+    camera.rotation = 180
 
     # ストリームを作成
     with picamera.array.PiRGBArray(camera) as stream:
